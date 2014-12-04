@@ -153,87 +153,124 @@ void BTree::print(){
 	std::cout<<"-----------------------------"<<std::endl;
 }
 
-BTreeNode* BTree::_getBrother(BTreeNode* node, BTreeNode* &parent, list<int>::iterator &iter_k, list<BTreeNode*>::iterator &iter_c){
-	int key = node->keys.back();
-	parent = node->parent;
+void BTree::adjustLessRoot(){
+	root = root->childs.front();
+	root->parent = NULL;
+}
+
+void BTree::_findIterator(BTreeNode *node, Key_Iter &iter_k, Childs_Iter &iter_c){
+	if(node == root)	return;
+	if(node->nums == 0){
+		BTreeNode *parent = node->parent;
+		iter_k = parent->keys.begin();
+		iter_c = parent->childs.begin();
+		while(node->rank-- > 0){
+			iter_k++;
+			iter_c++;
+		}
+		return;
+	}
+	BTreeNode *parent = node->parent;
 	iter_k = parent->keys.begin();
 	iter_c = parent->childs.begin();
-	while(iter_k != parent->keys.end() && *iter_k < key){
+	int key = node->keys.front();
+	while(iter_k != parent->keys.end() && key > *iter_k){
 		iter_k++;
 		iter_c++;
 	}
-	if(iter_k != parent->keys.end() || parent == root){
-		list<BTreeNode*>::iterator iter = iter_c;
-		iter++;
-		return *iter;
-	}else{
-		while(1){
-			node = parent;
-			parent = node->parent;
-			key = node->keys.back();
-			iter_k = parent->keys.begin();
-			iter_c = parent->childs.begin();
-			while(iter_k != parent->keys.end() && *iter_k < key){
-				iter_k++;
-				iter_c++;
-			}
-			if(iter_k != parent->keys.end() || parent == root){
-				list<BTreeNode*>::iterator iter = iter_c;
-				iter++;
-				return *iter;
-			}
+}
+
+bool BTree::adjustLessBrother(BTreeNode *node){
+	BTreeNode *parent = node->parent;
+	Key_Iter iter_pk;
+	Childs_Iter iter_pc;
+	_findIterator(node, iter_pk, iter_pc);
+	if(iter_pk != parent->keys.begin()){ // 有左兄弟
+		iter_pc--;
+		BTreeNode *left = *iter_pc;
+		iter_pc++;
+		if(left->nums > up - 1){ // 情况2b
+			iter_pk--;
+			node->keys.push_front(*iter_pk);
+			node->childs.push_front(left->childs.back());
+			node->nums++;
+			*iter_pk = left->keys.back();
+			left->childs.pop_back();
+			left->keys.pop_back();
+			left->nums--;
+			node->childs.front()->parent = node;
+			iter_pk++;
+			return true;
 		}
 	}
+	if(iter_pk != parent->keys.end()){ // 有右兄弟
+		iter_pc++;
+		BTreeNode *right = *iter_pc;
+		iter_pc--;
+		if(right->nums > up - 1){	// 情况2b
+			node->keys.push_back(*iter_pk);
+			node->childs.push_back(right->childs.front());
+			node->nums++;
+			*iter_pk = right->keys.front();
+			right->childs.pop_front();
+			right->keys.pop_front();
+			right->nums--;
+			node->childs.back()->parent = node;
+			return true;
+		}
+	}
+	if(parent->nums == 1 && parent->parent){
+		Key_Iter iiter = parent->parent->keys.begin();
+		int key = parent->keys.front();
+		parent->rank = 0;
+		while(iiter != parent->parent->keys.end() && key > *iiter){
+			iiter++;
+			parent->rank++;
+		}
+	}
+	// 情况2c
+	if(iter_pk != parent->keys.begin()){ // 有左兄弟
+		iter_pc--;
+		BTreeNode *left = *iter_pc;
+		iter_pc++;
+		iter_pk--;
+		left->keys.push_back(*iter_pk);
+		left->keys.insert(left->keys.end(), node->keys.begin(), node->keys.end());
+		left->childs.insert(left->childs.end(), node->childs.begin(), node->childs.end());
+		left->nums = left->nums + 1 + node->nums;
+		iter_pk++;
+		parent->keys.erase(iter_pk);
+		parent->childs.erase(iter_pc);
+		parent->nums--;
+		for(Childs_Iter  iter_c = node->childs.begin(); iter_c != node->childs.end(); iter_c++){
+			(*iter_c)->parent = left;
+		}
+	}else{ // 有右兄弟
+		iter_pc++;
+		BTreeNode *right = *iter_pc;	
+		node->keys.push_back(*iter_pk);
+		node->keys.insert(node->keys.end(), right->keys.begin(), right->keys.end());
+		node->childs.insert(node->childs.end(), right->childs.begin(), right->childs.end());
+		node->nums = node->nums + 1 + right->nums;
+		parent->keys.erase(iter_pk);
+		parent->childs.erase(iter_pc);
+		iter_pc--;
+		parent->nums--;
+		for(Childs_Iter iter_c = right->childs.begin(); iter_c != right->childs.end(); iter_c++){
+			(*iter_c)->parent = node;
+		}
+	}
+	if(parent->nums < up - 1)
+		adjustLess(parent);
 }
 
 void BTree::adjustLess(BTreeNode *node){
-	BTreeNode *parent = node->parent;
-	if(!parent)	return;
-	list<int>::iterator iter_k;
-	list<BTreeNode*>::iterator iter_c;
-	int key = node->keys.front();
-	BTreeNode *left = NULL;
-	_getBrother(node, parent, iter_k, iter_c);
-	if(iter_k == parent->keys.end()){
-		left->keys.push_back(parent->keys.back());
-		left->childs.push_back(node->childs.front());
-		node->childs.front()->parent = left;
-		left->nums++;
-		list<int>::iterator iter_sk = node->keys.begin();
-		list<BTreeNode*>::iterator iter_sc = node->childs.begin();
-		iter_sc++;
-		while(iter_sk != node->keys.end()){
-			left->keys.push_back(*iter_sk);
-			left->childs.push_back(*iter_sc);
-			(*iter_sc)->parent = left;
-			iter_sk++;
-			iter_sc++;
-			left->nums++;
-		}
-		parent->keys.pop_back();
-		parent->childs.pop_back();
-		parent->nums--;
-		if(parent->nums == 0){
-			root = left;
-			root->parent = NULL;
-			return;
-		}
-		if(parent->nums < up - 1)
-			adjustLess(parent);
+	if(node == root){ // root为空
+		if(node->nums)	return;
+		adjustLessRoot();
 		return;
 	}
-	iter_c++;
-	BTreeNode *right = *iter_c;
-	node->keys.push_back(*iter_k);
-	node->childs.push_back(right->childs.front());
-	node->nums++;
-	right->childs.front()->parent = node;
-	*iter_k = right->keys.front();
-	right->keys.pop_front();
-	right->childs.pop_front();
-	right->nums--;
-	if(right->nums < up - 1)
-		adjustLess(right);
+	adjustLessBrother(node); // 情况2
 }
 
 void BTree::_removeExternal(int key, BTreeNode *node){
@@ -252,7 +289,7 @@ void BTree::_removeExternal(int key, BTreeNode *node){
 	node->keys.erase(iter_k);	//　默认情况2a 
 	node->childs.erase(iter_c);
 	node->nums--;
-	if(node->nums < up){// 转至情况2b,2c
+	if(node->nums < up - 1){// 转至情况2b,2c
 		adjustLess(node);
 	}
 }

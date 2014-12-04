@@ -7,15 +7,19 @@ using std::list;
 
 struct BTreeNode{
 	int nums;
+	int rank;
 	BTreeNode *parent;
 	list<int> keys;
 	list<BTreeNode*> childs;
-	BTreeNode(int nums = 0, BTreeNode *parent = NULL):nums(nums), parent(parent){ }
+	BTreeNode(int nums = 0, BTreeNode *parent = NULL):nums(nums), parent(parent), rank(-1){ }
 	~BTreeNode(){
 	}
 };
 
 class BTree{
+	private:
+		typedef list<int>::iterator Key_Iter;
+		typedef list<BTreeNode*>::iterator Childs_Iter;
 	public:
 		BTree(int m = 3) : root(new BTreeNode()), m(m), up((m+1)/2) {}
 
@@ -55,6 +59,12 @@ class BTree{
 
 		BTreeNode* _getMax(BTreeNode *node);
 
+		void adjustLessRoot();
+
+		bool adjustLessBrother(BTreeNode *node);
+	
+		void _findIterator(BTreeNode *node, Key_Iter &iter_k, Childs_Iter &iter_c);
+
 	private:
 		// tree root node
 		BTreeNode *root;
@@ -62,6 +72,7 @@ class BTree{
 		const int m;
 	
 		const int up;
+
 };
 
 #endif
