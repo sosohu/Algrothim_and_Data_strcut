@@ -1,0 +1,43 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AR	Define.mk	/^AR=ar$/;"	m
+ARFLAGS	Define.mk	/^ARFLAGS=-r$/;"	m
+BTree	include/b_tree.h	/^		BTree(int m = 3) : root(new BTreeNode()), m(m) {}$/;"	f	class:BTree
+BTree	include/b_tree.h	/^class BTree{$/;"	c
+BTreeNode	include/b_tree.h	/^	BTreeNode(int nums = 0, BTreeNode *parent = NULL):nums(nums), parent(parent){ }$/;"	f	struct:BTreeNode
+BTreeNode	include/b_tree.h	/^struct BTreeNode{$/;"	s
+CC	Define.mk	/^CC=gcc$/;"	m
+CFLAGS	Define.mk	/^CFLAGS=-O3 -fPIC --std=c++0x -fpermissive -DDEBUG -g$/;"	m
+CXXFLAGS	Define.mk	/^CXXFLAGS=-O3 -fPIC --std=c++0x -fpermissive -DDEBUG -g$/;"	m
+DATA_SIZE	test/main.cc	/^const int DATA_SIZE = 13;$/;"	v
+HOME	Define.mk	/^HOME=\/home\/sosohu\/huqinghai\/learn\/Algrothim_and_Data_strcut\/Tree\/B-Tree$/;"	m
+IINC	src/Makefile	/^IINC=-I$(INC)$/;"	m
+IINC	test/Makefile	/^IINC=-I$(INC)$/;"	m
+INC	Define.mk	/^INC=$(HOME)\/include$/;"	m
+LIBGL	Define.mk	/^LIBGL=$/;"	m
+LIBS	Define.mk	/^LIBS=$(LIBGL)$/;"	m
+LIB_PATH	Define.mk	/^LIB_PATH=$(HOME)\/lib$/;"	m
+OBJS	src/Makefile	/^OBJS= $(patsubst %.c,%.o,$(wildcard *.c))$/;"	m
+SRC	Define.mk	/^SRC=$(HOME)\/src$/;"	m
+TEST	Define.mk	/^TEST=$(HOME)\/test$/;"	m
+__B_TREE__H__	include/b_tree.h	2;"	d
+_find	src/b_tree.cc	/^BTreeNode* BTree::_find(int key, BTreeNode *root){$/;"	f	class:BTree
+_prePrint	src/b_tree.cc	/^void BTree::_prePrint(BTreeNode *root){$/;"	f	class:BTree
+adjust	src/b_tree.cc	/^void BTree::adjust(BTreeNode *node){$/;"	f	class:BTree
+childs	include/b_tree.h	/^	list<BTreeNode*> childs;$/;"	m	struct:BTreeNode
+empty	src/b_tree.cc	/^bool BTree::empty(){$/;"	f	class:BTree
+find	src/b_tree.cc	/^BTreeNode* BTree::find(int key){$/;"	f	class:BTree
+insert	src/b_tree.cc	/^void BTree::insert(int key){$/;"	f	class:BTree
+keys	include/b_tree.h	/^	list<int> keys;$/;"	m	struct:BTreeNode
+m	include/b_tree.h	/^		int m;$/;"	m	class:BTree
+main	test/main.cc	/^int main(){$/;"	f
+nums	include/b_tree.h	/^	int nums;$/;"	m	struct:BTreeNode
+parent	include/b_tree.h	/^	BTreeNode *parent;$/;"	m	struct:BTreeNode
+print	src/b_tree.cc	/^void BTree::print(){$/;"	f	class:BTree
+root	include/b_tree.h	/^		BTreeNode *root;$/;"	m	class:BTree
+~BTree	include/b_tree.h	/^		~BTree(){}$/;"	f	class:BTree
+~BTreeNode	include/b_tree.h	/^	~BTreeNode(){$/;"	f	struct:BTreeNode
