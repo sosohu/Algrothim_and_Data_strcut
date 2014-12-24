@@ -65,4 +65,7 @@ void CountPath(TreeNode *root, TreeNode* node, int &reslut);
 // distance of node1 and node2
 void CountPath(TreeNode *root, TreeNode* node1, TreeNode* node2, int &reslut);
 
+// max path in the tree
+int MaxPath(TreeNode *root);
+
 #endif

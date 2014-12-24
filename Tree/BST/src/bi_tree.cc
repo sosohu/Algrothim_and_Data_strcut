@@ -239,6 +239,23 @@ void CountPath(TreeNode *root, TreeNode* node1, TreeNode* node2, int &reslut){
 	_CountPath(root, node1, node2, reslut);
 }
 
+int _MaxPath(TreeNode *root, int &in){
+	if(!root)	return 0;
+	int l = 0, r = 0, left = 0 , right = 0;
+	left = _MaxPath(root->left, l);
+	right = _MaxPath(root->right, r);
+	int ret = l + r + 1;
+	ret = ret < left ? left : ret;
+	ret = ret < right ? right : ret;
+	in = l < r ? r + 1 : l + 1;
+	return ret;
+}
+
+int MaxPath(TreeNode *root){
+	int in = 0;
+	return _MaxPath(root, in);
+}
+
 TreeNode * _NearestCommAncestor(TreeNode *root, TreeNode *node1, TreeNode *node2){
 	if(!root || !node1 || !node2)	return NULL;
 	if(node1 == root || node2 == root)

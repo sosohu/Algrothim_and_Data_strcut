@@ -56,6 +56,8 @@ void otherTest(){
 	bs.InOrderTraversal();
 	cout<<"find common Ancestor"<<endl;
 	cout<<NearestCommAncestor(&bs, bs.find(5), bs.find(9))->val<<endl;
+	cout<<"max path"<<endl;
+	cout<<MaxPath(bs.find(3))<<endl;
 	cout<<"get path"<<endl;
 	vector<TreeNode*> ret;
 	GetPath(bs.find(7), bs.find(6), ret);
