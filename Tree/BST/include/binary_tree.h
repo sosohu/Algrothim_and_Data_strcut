@@ -1,6 +1,7 @@
 #ifndef __BINARY_TREE__H__
 #define __BINARY_TREE__H__
 #include <cstdlib>
+#include <vector>
 
 struct TreeNode{
 	int val;
@@ -29,6 +30,10 @@ public:
 		return true;
 	}
 
+	friend void GetPath(BiTree* bt, TreeNode* node, std::vector<TreeNode*> &path);
+
+	friend TreeNode * NearestCommAncestor(BiTree* bt, TreeNode* node1, TreeNode* node2);
+
 	protected:
 
 	void PreOrderTraversal(TreeNode* r);
@@ -50,5 +55,14 @@ public:
 int getHeight(TreeNode *rt);
 
 int genHeight(TreeNode *rt);
+
+//　根节点到指定节点的路径
+void GetPath(TreeNode *root, TreeNode* node, std::vector<TreeNode*> &path);
+
+//　根节点到指定节点的距离
+void CountPath(TreeNode *root, TreeNode* node, int &reslut);
+
+// distance of node1 and node2
+void CountPath(TreeNode *root, TreeNode* node1, TreeNode* node2, int &reslut);
 
 #endif

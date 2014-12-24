@@ -1,6 +1,7 @@
 #include "binary_tree.h"
 #include <iostream>
 #include <stack>
+#include <vector>
 
 using std::cout;
 using std::endl;
@@ -168,3 +169,92 @@ int genHeight(TreeNode *rt){
 	return getHeight(rt->left) > getHeight(rt->right)? 
 			getHeight(rt->left) + 1 : getHeight(rt->right) + 1;
 }
+
+void _GetPath(TreeNode *root, TreeNode* node, std::vector<TreeNode*> &path, std::vector<TreeNode*> &tmp){
+	if(!root || !node || !path.empty())	return;
+	tmp.push_back(root);
+	if(root == node){
+		path.swap(tmp);
+		return;
+	}
+	if(root->left)
+		_GetPath(root->left, node, path, tmp);
+	if(root->right)
+		_GetPath(root->right, node, path, tmp);
+	tmp.pop_back();
+}
+
+void GetPath(BiTree *bt, TreeNode* node, std::vector<TreeNode*> &path){
+	std::vector<TreeNode*> tmp;
+	_GetPath(bt->root, node, path, tmp);
+}
+
+void GetPath(TreeNode *root, TreeNode* node, std::vector<TreeNode*> &path){
+	std::vector<TreeNode*> tmp;
+	_GetPath(root, node, path, tmp);
+}
+
+void CountPath(TreeNode *root, TreeNode* node, int &result, int &tmp){
+	if(!root || !node || result)	return;
+	tmp++;
+	if(root == node){
+		result = tmp;
+		return;
+	}
+	if(root->left)
+		CountPath(root->left, node, result, tmp);
+	if(root->right)
+		CountPath(root->right, node, result, tmp);
+	tmp--;
+}
+
+void CountPath(TreeNode *root, TreeNode* node, int &result){
+	int tmp = -1;
+	result = 0;
+	CountPath(root, node, result, tmp);
+}
+
+int _CountPath(TreeNode *root, TreeNode* node1, TreeNode* node2, int& result){
+	if(!root || !node1 || !node2 )	return -1;
+	if(result)	return result;
+	if(root == node1){
+		CountPath(node1, node2, result);
+		return result;
+	}
+	if(root == node2){
+		CountPath(node2, node1, result);
+		return result;
+	}
+	int left = _CountPath(root->left, node1, node2, result);
+	int right = _CountPath(root->right, node1, node2, result);
+	if(left != -1 && right != -1){
+		result = left + right;
+		return result;
+	}
+	return left == -1? right : left;
+}
+
+void CountPath(TreeNode *root, TreeNode* node1, TreeNode* node2, int &reslut){
+	reslut = 0;
+	_CountPath(root, node1, node2, reslut);
+}
+
+TreeNode * _NearestCommAncestor(TreeNode *root, TreeNode *node1, TreeNode *node2){
+	if(!root || !node1 || !node2)	return NULL;
+	if(node1 == root || node2 == root)
+		return root;
+	if(!root->left)
+		return _NearestCommAncestor(root->right, node1, node2);
+	if(!root->right)
+		return _NearestCommAncestor(root->left, node1, node2);
+	TreeNode *left, *right;
+	left = _NearestCommAncestor(root->left, node1, node2);
+	right = _NearestCommAncestor(root->right, node1, node2);
+	if(left && right)	return root;
+	return left? left : right;
+}
+
+TreeNode * NearestCommAncestor(BiTree* bt, TreeNode* node1, TreeNode* node2){
+	return _NearestCommAncestor(bt->root, node1, node2);
+}
+

@@ -26,7 +26,7 @@ void testBs(){
 	cout<<bs.find(3)->val<<endl;
 }
 
-int main(){
+void AVLTest(){
 	ATree bs;
 	for(int i = 0; i < DATASIZE; i++){
 		cout<<"PreOrderTraversal"<<endl;
@@ -43,4 +43,29 @@ int main(){
 	cout<<"InOrderTraversal"<<endl;
 	bs.InOrderTraversal();
 	//cout<<bs.find(3)->val<<endl;
+}
+
+void otherTest(){
+	ATree bs;
+	for(int i = 0; i < DATASIZE; i++){
+		bs.insert(i);
+	}
+	cout<<"PreOrderTraversal"<<endl;
+	bs.PreOrderTraversal();
+	cout<<"InOrderTraversal"<<endl;
+	bs.InOrderTraversal();
+	cout<<"find common Ancestor"<<endl;
+	cout<<NearestCommAncestor(&bs, bs.find(5), bs.find(9))->val<<endl;
+	cout<<"get path"<<endl;
+	vector<TreeNode*> ret;
+	GetPath(bs.find(7), bs.find(6), ret);
+	int c;
+	CountPath(bs.find(3), bs.find(7), bs.find(6), c);
+	cout<<c<<endl;
+	for(int i = 0; i < ret.size(); i++)
+		cout<<ret[i]->val<<endl;
+}
+
+int main(){
+	otherTest();
 }
