@@ -38,6 +38,7 @@ void BiTree::PostOrderTraversal(TreeNode* root){
 */
 
 //	迭代
+/*
 void BiTree::PreOrderTraversal(TreeNode* root){
 	if(!root)	return;
 	stack<TreeNode*> s;
@@ -77,6 +78,7 @@ void BiTree::InOrderTraversal(TreeNode* root){
 		}
 	}
 }
+*/
 
 void BiTree::PostOrderTraversal(TreeNode* root){
 	if(!root)	return;
@@ -97,6 +99,55 @@ void BiTree::PostOrderTraversal(TreeNode* root){
 			if(pos->left){
 				s.push(pos->right);
 			}
+		}
+	}
+}
+
+// 线索化
+void BiTree::PreOrderTraversal(TreeNode* root){
+	if(!root)	return;
+	TreeNode *curr = root, *next;
+	while(curr){
+		next = curr->left;
+		if(!next){
+			cout<<curr->val<<endl;
+			curr = curr->right;
+			continue;
+		}
+		while(next->right && next->right != curr){
+			next = next->right;
+		}
+		if(next->right == curr){
+			next->right = NULL;
+			curr = curr->right;
+		}else{
+			cout<<curr->val<<endl;
+			next->right = curr;
+			curr = curr->left;
+		}
+	}
+}
+
+void BiTree::InOrderTraversal(TreeNode* root){
+	if(!root)	return;
+	TreeNode *curr = root, *next;
+	while(curr){
+		next = curr->left;
+		if(!next){
+			cout<<curr->val<<endl;
+			curr = curr->right;
+			continue;
+		}
+		while(next->right && next->right != curr){
+			next = next->right;
+		}
+		if(next->right == curr){
+			next->right = NULL;
+			cout<<curr->val<<endl;
+			curr = curr->right;
+		}else{
+			next->right = curr;
+			curr = curr->left;
 		}
 	}
 }

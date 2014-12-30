@@ -1,5 +1,6 @@
 #include "bst.h"
 #include "avl.h"
+#include "huf.h"
 #include <iostream>
 #include <vector>
 
@@ -68,6 +69,17 @@ void otherTest(){
 		cout<<ret[i]->val<<endl;
 }
 
+void HufTest(){
+	int data[10] = {1,2,3,4,5,6,7,8,9,10};
+	HufTree ht(data, 10);
+	cout<<"PreOrderTraversal"<<endl;
+	ht.PreOrderTraversal();
+	cout<<"InOrderTraversal"<<endl;
+	ht.InOrderTraversal();
+	cout<<"getWPL"<<endl;
+	cout<<ht.getWPL()<<endl;
+}
+
 int main(){
-	otherTest();
+	HufTest();
 }
