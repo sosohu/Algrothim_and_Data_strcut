@@ -57,6 +57,13 @@ struct Node{
 	Node(int index = 0, int weight = 0) : index(index), weight(weight){}
 };
 
+struct Edge{
+	int s;
+	int e; 
+	int w; // 权值
+	Edge(int s = 0, int e = 0, int w = 0) : s(s), e(e), w(w){}
+};
+
 class Graph_List : public Graph{
 public:
 	Graph_List(Graph_Kind k = UG, int n = 0, int m = -1) : Graph(k, n, m), list(vector<vector<Node> > (n, vector<Node>())){}
@@ -85,5 +92,9 @@ int MinSpanTree_Kruskal(vector<vector<Node> > &data); // data是邻接表
 vector<int> jointPointSearch(vector<vector<Node> > &data); // data是邻接表
 
 vector<int> topoSort(vector<vector<Node> > &data);  // data是邻接表
+
+vector<Edge> criticalPath(vector<vector<Node> > &data);  // data是邻接表
+
+vector<Edge> dijMinPath(vector<vector<Node> > &data); // data是邻接表
 
 #endif

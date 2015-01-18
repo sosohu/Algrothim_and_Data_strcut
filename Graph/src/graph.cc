@@ -7,6 +7,7 @@ using std::cout;
 using std::endl;
 using std::queue;
 using std::min;
+using std::max;
 using std::pair;
 using std::make_pair;
 
@@ -103,6 +104,7 @@ void bfs(Graph *g){
 }
 
 // Prim  -----------------------------------------------------
+// assume that all the path value is greater than 0
 // Time Complex O(VlgV)
 int MinSpanTree_Prim(vector<vector<int> > &data){
 	int n = data.size();
@@ -134,13 +136,6 @@ int MinSpanTree_Prim(vector<vector<int> > &data){
 
 //kruskal ----------------------------------------------------
 // Time Complex O(ElgE)
-struct Edge{
-	int s;
-	int e; 
-	int w; // 权值
-	Edge(int s, int e, int w) : s(s), e(e), w(w){}
-};
-
 bool EdgeCmp(const Edge& a, const Edge& b){
     return a.w < b.w;
 }
@@ -265,3 +260,90 @@ vector<int> topoSort(vector<vector<Node> > &data){
 	return ret;
 }
 //topo sort    -----------------------------------------------
+void criticalDfs(vector<vector<Node> > &data, vector<int> &ve, 
+				vector<int> &vl, int start, bool isStart = false){
+	if(isStart)
+		ve[start] = 0;
+	int index;
+	int sons = 0;
+	for(int i = 0; i < data[start].size(); i++){
+		index = data[start][i].index;
+		ve[index] = max(ve[index], ve[start] + data[start][i].weight);
+		criticalDfs(data, ve, vl, index);
+		vl[start] = min(vl[start], vl[index] + data[start][i].weight);
+		sons++;
+	}
+	if(sons == 0)	vl[start] = 0;  // end point
+}
+
+//criticalPath -----------------------------------------------
+//assume that only one point without in diraction edge and one point without out diraction edge
+//Time Complex O(N + E)
+vector<Edge> criticalPath(vector<vector<Node> > &data, int start){
+	int vecnum = data.size();
+	// point eariest start time, lastest start time
+	vector<int> ve(vecnum, INT_MIN), vl(vecnum, INT_MAX); 
+
+	//compute ve and vl
+	criticalDfs(data, ve, vl, start, true);
+
+	//compute ee and el
+	vector<Edge> ret;
+	for(int i = 0; i < vecnum; i++){
+		for(int j = 0; j < data[i].size(); j++){
+			int index = data[i][j].index;
+			// ee[k] == el[k], k is the edge of i -> index
+			if(ve[i] == vl[index] - data[i][j].weight){
+				ret.push_back(Edge(i, index, data[i][j].weight));
+			}
+		}
+	}
+	return ret;
+}
+//criticalPath -----------------------------------------------
+
+//dijkstra_MinPath -------------------------------------------
+//Time Complex O(n^2)
+int findMin(vector<pair<int, int> > &D){
+	int min = INT_MAX;
+	int pos = 0;
+	for(int i = 0; i < D.size(); i++){
+		if(D[i].second != -1 && min > D[i].second){
+			pos = i;
+			min = D[i].second;
+		}
+	}
+	return pos;
+}
+vector<Edge> dijMinPath(vector<vector<Node> > &data, int start = 0){
+	int vecnum = data.size();
+	vector<pair<int, int> > D(vecnum, make_pair(-1, INT_MAX));
+	for(int i = 0; i < vecnum; i++)
+		D[i].first = i;
+	for(int i = 0; i < data[start].size(); i++){
+		D[data[start][i].index].second = data[start][i].weight;
+	}
+	vector<Edge> ret;
+	int count = 0;
+	Edge e(start, 0, 0);
+	pair<int, int> p;
+	
+	while(count++ < vecnum - 1){
+		int index = findMin(D);
+		p = D[index];
+		D[index].second = -1; // set has visited
+		
+		e.e = p.first;
+		e.w = p.second;
+		ret.push_back(e);
+		int cur = p.first;
+		for(int i = 0; i < data[cur].size(); i++){
+			int next = data[cur][i].index;
+			int weight = data[cur][i].weight;
+			if(D[next].second != -1 && D[next].second < p.second + weight){
+				D[next].second = p.second + weight;
+			}
+		}
+	}
+	return ret;
+}
