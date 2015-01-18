@@ -227,7 +227,7 @@ vector<int> jointPointSearch(vector<vector<Node> > &data){
 
 //topo sort    -----------------------------------------------
 //使用dfs方式进行topo排序
-//Time Complex O(N + E)
+//Time Complex O(V + E)
 void topoDfs(vector<vector<Node> > &data, vector<int> &inDegree,
 			 vector<int> &ret, int v){
 	ret.push_back(v);
@@ -278,7 +278,7 @@ void criticalDfs(vector<vector<Node> > &data, vector<int> &ve,
 
 //criticalPath -----------------------------------------------
 //assume that only one point without in diraction edge and one point without out diraction edge
-//Time Complex O(N + E)
+//Time Complex O(V + E)
 vector<Edge> criticalPath(vector<vector<Node> > &data, int start){
 	int vecnum = data.size();
 	// point eariest start time, lastest start time
@@ -303,7 +303,7 @@ vector<Edge> criticalPath(vector<vector<Node> > &data, int start){
 //criticalPath -----------------------------------------------
 
 //dijkstra_MinPath -------------------------------------------
-//Time Complex O(n^2)
+//Time Complex O(V^2)
 int findMin(vector<pair<int, int> > &D){
 	int min = INT_MAX;
 	int pos = 0;
@@ -315,6 +315,7 @@ int findMin(vector<pair<int, int> > &D){
 	}
 	return pos;
 }
+
 vector<Edge> dijMinPath(vector<vector<Node> > &data, int start = 0){
 	int vecnum = data.size();
 	vector<pair<int, int> > D(vecnum, make_pair(-1, INT_MAX));
@@ -346,4 +347,27 @@ vector<Edge> dijMinPath(vector<vector<Node> > &data, int start = 0){
 		}
 	}
 	return ret;
+}
+//dijkstra_MinPath -------------------------------------------
+
+
+//floyd_MinPath -------------------------------------------
+//all point to point min path
+//Time Complex O(V^3)
+vector<vector<int> > floydMinPath(vector<vector<int> > &data){
+	int vecnum = data.size();
+	vector<vector<int> > DO(data);
+	vector<vector<int> > DN(vecnum, vector<int>(vecnum, INT_MAX));
+	int count = 0;
+	
+	while(count < vecnum){
+		for(int i = 0; i < vecnum; i++){
+			for(int j = 0; j < vecnum; j++){
+				DN[i][j] = min(DO[i][j], DO[i][count] + DO[count][j]);
+			}
+		}
+		DO = DN;
+		count++;
+	}
+	return DN;
 }

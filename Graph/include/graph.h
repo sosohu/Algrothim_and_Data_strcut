@@ -97,4 +97,6 @@ vector<Edge> criticalPath(vector<vector<Node> > &data);  // data是邻接表
 
 vector<Edge> dijMinPath(vector<vector<Node> > &data); // data是邻接表
 
+vector<vector<int> > floydMinPath(vector<vector<int> > &data); // data是邻接矩阵
+
 #endif
