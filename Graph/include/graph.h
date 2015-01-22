@@ -93,10 +93,15 @@ vector<int> jointPointSearch(vector<vector<Node> > &data); // data是邻接表
 
 vector<int> topoSort(vector<vector<Node> > &data);  // data是邻接表
 
-vector<Edge> criticalPath(vector<vector<Node> > &data);  // data是邻接表
+vector<vector<int> > allTopoSort(vector<vector<Node> > &data);  // data是邻接表
+
+vector<Edge> criticalPath(vector<vector<Node> > &data, int start, int end);  // data是邻接表
 
 vector<Edge> dijMinPath(vector<vector<Node> > &data); // data是邻接表
 
 vector<vector<int> > floydMinPath(vector<vector<int> > &data); // data是邻接矩阵
+
+//求有向图强连通分量问题
+vector<vector<int> > getStrongConnectComponent(vector<vector<Node> > &data);  // data是邻接表
 
 #endif

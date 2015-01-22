@@ -63,6 +63,7 @@ void dfs_aux(int i, Graph *g, vector<bool> &visited){
 }
 
 // 对于dfs和bfs,若是采用邻接矩阵存储则时间复杂度为O(V^2), 用邻接表存储时间复杂度为O(V+E)
+// 也可以用栈模拟实现递归
 void dfs(Graph *g){
 	cout<<"dfs:"<<endl;
 	int vexsize = g->vexsize();
@@ -78,16 +79,18 @@ void bfs_aux(int i, Graph *g, vector<bool> &visited){
 	queue<int> q;
 	q.push(i);
 	int cur;
+	visited[cur] = true;
 	vector<int> next;
 	while(!q.empty()){
 		cur = q.front();
 		q.pop();
-		visited[cur] = true;
 		cout<<cur<<endl;
 		next = g->getNeighbour(cur);
 		for(int j = 0; j < next.size(); j++){
-			if(!visited[next[j]])
+			if(!visited[next[j]]){
+				visited[next[j]] = true; // 一旦入队列就标记，以免被重复标记
 				q.push(next[j]);
+			}
 		}
 	}
 }
@@ -197,7 +200,7 @@ void jointDfs(vector<vector<Node> > &data, vector<int> &visited, vector<int> &lo
 		if(visited[cur.index] == INT_MAX){
 			sons++;
 			jointDfs(data, visited, low, ret, cur.index, count);
-			if(visited[v] <= low[cur.index])	ret.push_back(v);
+			if(visited[v] <= low[cur.index] && !isRoot)	ret.push_back(v);
 			l = min(low[cur.index], l);
 		}else{
 			l = min(visited[cur.index], l);
@@ -217,24 +220,26 @@ vector<int> jointPointSearch(vector<vector<Node> > &data){
 	int count = 0;
 
 	for(int i = 0; i < vecnum; i++){
-		if(visited[i] != INT_MAX){
+		if(visited[i] == INT_MAX){
 			jointDfs(data, visited, low, ret, i, count, true);
 		}
 	}
+	return ret;
 }
 //joint search -----------------------------------------------
 
 
 //topo sort    -----------------------------------------------
-//使用dfs方式进行topo排序
+//使用dfs方式进行topo排序,拓扑排序也可以用于判断有向图是否有环,有环则访问节点数少于总节点树.
 //Time Complex O(V + E)
 void topoDfs(vector<vector<Node> > &data, vector<int> &inDegree,
-			 vector<int> &ret, int v){
+			 vector<bool> &visited, vector<int> &ret, int v){
 	ret.push_back(v);
+	visited[v] = true;
 	for(int i = 0; i < data[v].size(); i++){
 		inDegree[data[v][i].index]--;
 		if(inDegree[data[v][i].index] == 0){
-			topoDfs(data, inDegree, ret, data[v][i].index);
+			topoDfs(data, inDegree, visited, ret, data[v][i].index);
 		}
 	}
 }
@@ -242,50 +247,129 @@ void topoDfs(vector<vector<Node> > &data, vector<int> &inDegree,
 vector<int> topoSort(vector<vector<Node> > &data){
 	int vecnum = data.size();
 	vector<int> inDegree(vecnum, 0);
-	vector<int> ret(vecnum, 0);
+	vector<bool> visited(vecnum, false);
+	vector<int> ret;
 
 	//compute in degree
 	for(int i = 0; i < vecnum; i++){
-		for(int j = 0; j < data[i].size(); i++){
+		for(int j = 0; j < data[i].size(); j++){
 			inDegree[data[i][j].index]++;
 		}
 	}
 	//dfs
 	int count = 0;
 	for(int i = 0; i < vecnum; i++){
-		if(inDegree[i] == 0){
-			topoDfs(data, inDegree, ret, i);
+		if(!visited[i] && inDegree[i] == 0){
+			topoDfs(data, inDegree, visited, ret, i);
 		}
 	}
 	return ret;
 }
 //topo sort    -----------------------------------------------
-void criticalDfs(vector<vector<Node> > &data, vector<int> &ve, 
-				vector<int> &vl, int start, bool isStart = false){
-	if(isStart)
-		ve[start] = 0;
-	int index;
-	int sons = 0;
-	for(int i = 0; i < data[start].size(); i++){
-		index = data[start][i].index;
-		ve[index] = max(ve[index], ve[start] + data[start][i].weight);
-		criticalDfs(data, ve, vl, index);
-		vl[start] = min(vl[start], vl[index] + data[start][i].weight);
-		sons++;
+
+//All Topo Sort    -----------------------------------------------
+//输出所有topo序
+//Time Complex O(V!)  ???
+void allTopoDfs(vector<vector<Node> > &data, vector<int> &inDegree, vector<bool> &visited, 
+				vector<int> &trace, vector<vector<int> > &ret, int v){
+	trace.push_back(v);
+	visited[v] = true;
+	vector<int> bpt;
+	vector<int> bpi;
+	for(int i = 0; i < data[v].size(); i++){
+		inDegree[data[v][i].index]--;
 	}
-	if(sons == 0)	vl[start] = 0;  // end point
+	for(int i = 0; i < data.size(); i++){
+		if(!visited[i] && inDegree[i] == 0){
+			bpt = trace;
+			bpi = inDegree;
+			allTopoDfs(data, inDegree, visited, trace, ret, i);
+			trace = bpt;
+			inDegree = bpi;
+		}
+	}
+	if(trace.size() == data.size()){
+		ret.push_back(trace);
+	}
+	visited[v] = false;
 }
+
+vector<vector<int> > allTopoSort(vector<vector<Node> > &data){
+	int vecnum = data.size();
+	vector<int> inDegree(vecnum, 0);
+	vector<bool> visited(vecnum, false);
+	vector<vector<int> > ret;
+	vector<int> trace;
+	vector<int> bpt, bpi;
+
+	//compute in degree
+	for(int i = 0; i < vecnum; i++){
+		for(int j = 0; j < data[i].size(); j++){
+			inDegree[data[i][j].index]++;
+		}
+	}
+	//dfs
+	for(int i = 0; i < data.size(); i++){
+		if(inDegree[i] == 0){
+			bpt = trace;
+			bpi = inDegree;
+			allTopoDfs(data, inDegree, visited, trace, ret, i);
+			trace = bpt;
+			inDegree = bpi;
+		}
+	}
+
+	return ret;
+}
+
+//All Topo Sort    -----------------------------------------------
 
 //criticalPath -----------------------------------------------
 //assume that only one point without in diraction edge and one point without out diraction edge
 //Time Complex O(V + E)
-vector<Edge> criticalPath(vector<vector<Node> > &data, int start){
+void criticalDfs(vector<vector<Node> > &data, vector<int> &order, 
+				vector<int> &Indegree, int start){
+	int index;
+	order.push_back(start);
+	for(int i = 0; i < data[start].size(); i++){
+		index = data[start][i].index;
+		Indegree[index]--;
+		if(Indegree[index] == 0)
+			criticalDfs(data, order, Indegree, index);
+	}
+}
+
+vector<Edge> criticalPath(vector<vector<Node> > &data, int start, int end){
 	int vecnum = data.size();
 	// point eariest start time, lastest start time
 	vector<int> ve(vecnum, INT_MIN), vl(vecnum, INT_MAX); 
+	vector<int> order; // ianput by the topo sort order
+	vector<int> Indegree(vecnum, 0);
 
+	//topo sort
+	for(int i =0; i < data.size(); i++){
+		for(int j = 0; j < data[i].size(); j++){
+			Indegree[data[i][j].index]++;
+		}
+	}
+	criticalDfs(data, order, Indegree, start);
 	//compute ve and vl
-	criticalDfs(data, ve, vl, start, true);
+	ve[start] = 0;
+	int index;
+	for(int i = 0; i < vecnum - 1; i++){
+		index = order[i];
+		for(int j = 0; j < data[index].size(); j++){
+			ve[data[index][j].index] = max(ve[data[index][j].index], 
+										ve[index] + data[index][j].weight);
+		}
+	}
+	vl[end] = ve[end]; // 因为最后一个节点vl与ve相等,同理开始节点vl与ve也相等.
+	for(int i = vecnum - 2; i >= 0; i--){
+		index = order[i];
+		for(int j = 0; j < data[index].size(); j++){
+			vl[index] = min(vl[index], vl[data[index][j].index] - data[index][j].weight);
+		}
+	}
 
 	//compute ee and el
 	vector<Edge> ret;
@@ -316,6 +400,7 @@ int findMin(vector<pair<int, int> > &D){
 	return pos;
 }
 
+
 vector<Edge> dijMinPath(vector<vector<Node> > &data, int start = 0){
 	int vecnum = data.size();
 	vector<pair<int, int> > D(vecnum, make_pair(-1, INT_MAX));
@@ -341,7 +426,7 @@ vector<Edge> dijMinPath(vector<vector<Node> > &data, int start = 0){
 		for(int i = 0; i < data[cur].size(); i++){
 			int next = data[cur][i].index;
 			int weight = data[cur][i].weight;
-			if(D[next].second != -1 && D[next].second < p.second + weight){
+			if(D[next].second != -1 && D[next].second > p.second + weight){
 				D[next].second = p.second + weight;
 			}
 		}
@@ -354,16 +439,21 @@ vector<Edge> dijMinPath(vector<vector<Node> > &data, int start = 0){
 //floyd_MinPath -------------------------------------------
 //all point to point min path
 //Time Complex O(V^3)
+int FloydAdd(int a, int b){
+	if(a == INT_MAX || b == INT_MAX)	return INT_MAX;
+	return a+b;
+}
+
 vector<vector<int> > floydMinPath(vector<vector<int> > &data){
 	int vecnum = data.size();
 	vector<vector<int> > DO(data);
-	vector<vector<int> > DN(vecnum, vector<int>(vecnum, INT_MAX));
+	vector<vector<int> > DN(data);
 	int count = 0;
 	
 	while(count < vecnum){
 		for(int i = 0; i < vecnum; i++){
 			for(int j = 0; j < vecnum; j++){
-				DN[i][j] = min(DO[i][j], DO[i][count] + DO[count][j]);
+				DN[i][j] = min(DO[i][j], FloydAdd(DO[i][count], DO[count][j]));
 			}
 		}
 		DO = DN;
@@ -371,3 +461,48 @@ vector<vector<int> > floydMinPath(vector<vector<int> > &data){
 	}
 	return DN;
 }
+
+//--------------------Strong Connect Component--------------------------
+//Time Complex O(V + E)
+
+void SCCDfs(vector<vector<Node> > &data, vector<bool> &visited, vector<bool> &trace, int v){
+	trace[v] = true;
+	for(int i = 0; i < data[v].size(); i++){
+		if(!trace[data[v][i].index] && !visited[data[v][i].index]){
+			SCCDfs(data, visited, trace, data[v][i].index);
+		}
+	}
+}
+
+vector<vector<int> > getStrongConnectComponent(vector<vector<Node> > &data){
+	int vecnum = data.size();
+	vector<vector<int> > ret;
+	vector<bool> visited(vecnum, false);
+	vector<vector<Node> > reverse(vecnum, vector<Node>());
+
+	//reverse the data
+	for(int i = 0; i < data.size(); i++){
+		for(int j = 0; j < data[i].size(); j++){
+			reverse[data[i][j].index].push_back(Node(i, data[i][j].weight));
+		}
+	}
+
+	for(int i = 0; i < vecnum; i++){
+		if(!visited[i]){
+			vector<bool> forward(vecnum, false), back(vecnum, false);
+			vector<int> cur;
+			SCCDfs(data, visited, forward, i);
+			SCCDfs(reverse,visited, back, i);
+			for(int j = 0; j < vecnum; j++){
+				if(forward[j] && back[j]){
+					cur.push_back(j);
+					visited[j] = true;
+				}
+			}
+			ret.push_back(cur);
+		}
+	}
+	return ret;
+}
+
+//--------------------Strong Connect Component--------------------------
