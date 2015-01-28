@@ -463,7 +463,7 @@ vector<vector<int> > floydMinPath(vector<vector<int> > &data){
 }
 
 //--------------------Strong Connect Component--------------------------
-//Time Complex O(V + E)
+//Time Complex O(V^2)
 
 void SCCDfs(vector<vector<Node> > &data, vector<bool> &visited, vector<bool> &trace, int v){
 	trace[v] = true;
