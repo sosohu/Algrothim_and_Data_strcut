@@ -15,7 +15,7 @@ char *strcpy(char *dest, const char *src);
 
 char *strncpy(char *dest, const char *src, int n); 
 
-int strStr(const char *haystack, const char *needle);
+int strstr(const char *haystack, const char *needle);
 
 char *strcat(char *strDest, const char *strScr);
 
