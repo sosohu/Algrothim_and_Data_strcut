@@ -28,21 +28,21 @@ class string{
 public:
 	string(const char* str){
 		cap = strlen(str) == 0? 1 : 2*strlen(str);
-		data = (char*)malloc(size*sizeof(char));
+		data = (char*)malloc(cap*sizeof(char));
 		strcpy(data, str);
 		size = strlen(data);
 	}
 
 	string(const char* str, int len){
 		cap = len == 0? 1 : 2*len;
-		data = (char*)malloc(size*sizeof(char));
+		data = (char*)malloc(cap*sizeof(char));
 		strncpy(data, str, len);
 		size = strlen(data);
 	}
 
 	string(){
 		cap = 1;
-		data = (char*)malloc(size*sizeof(char));
+		data = (char*)malloc(cap*sizeof(char));
 		data[0] = '\0';
 		size = 0;
 	}
