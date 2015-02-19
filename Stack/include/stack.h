@@ -17,7 +17,7 @@ public:
 	void pop();
 	T	top() const;
 
-	bool empty() const;
+	inline bool empty() const;
 
 private:
 	vector<T> data;
